@@ -98,6 +98,26 @@ void polygone_ligne(LigneBrisee debut, LigneBrisee fin){
 	fin->suivant = NULL;
 	debut->precedent = NULL;
 }
+
+// 6 ---------------------------------------------------------------
+
+LigneBrisee closestVertex(Coordonnees p ,LigneBrisee l){
+	LigneBrisee i = l;
+	LigneBrisee dist_min = l;
+	int distance = abs(l->p.x - p.x) + abs(l->p.y - p.y);
+	i = i->suivant;
+	while (i != l && i!= NULL){
+		int tmp = abs(i->p.x - p.x) + abs(i->p.y - p.y);
+		if (distance > tmp){
+			dist_min = i;
+			distance = tmp;
+		}
+		i = i->suivant;
+	}
+	return dist_min;
+}
+
+
 //------------------------------------------------------------------
 //	C'est le display callback. A chaque fois qu'il faut
 //	redessiner l'image, c'est cette fonction qui est
@@ -124,9 +144,14 @@ void mouse_CB(int button, int state, int x, int y)
 {
 	if((button==GLUT_LEFT_BUTTON)&&(state==GLUT_DOWN)){
 		I_focusPoint(img,x,img->_height-y);
+		Coordonnees p = {x,img->_height-y};
+		if(vertex){
+			I_plotColor  (img, vertex_selec->p.x, vertex_selec->p.y, C_new(255,255,255));
+			vertex_selec = closestVertex(p,ligne_dep);
+			I_plotColor  (img, vertex_selec->p.x, vertex_selec->p.y, C_new(255,0,0));
+		}
 		if(!polygone && insert){
 			//position++;
-			Coordonnees p = {x,img->_height-y};
 			//coord[position] = p;
 			I_plot(img,x,img->_height-y);
 
